@@ -1,10 +1,7 @@
 {
   "name": "opencast-studio-lti",
   "private": true,
-  "scripts": {
-    "eslint": "eslint --config ../../docs/checkstyle/eslintrc.js src/main/resources/",
-    "html-linter": "html-linter --config ../../docs/checkstyle/html-linter.json 'src/main/resources/**/*.html'"
-  },
+  "scripts": {},
   "dependencies": {
     "font-awesome": "^4.7.0",
     "jquery": "^3.4.1",
