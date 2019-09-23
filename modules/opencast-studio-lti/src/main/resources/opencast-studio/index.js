@@ -80,8 +80,9 @@ function main() {
     cred_xhr(origin + "/info/me.json").then(me_info_json => {
         let me_info = JSON.parse(me_info_json);
         if (me_info.roles.includes("ROLE_OAUTH_USER")) {
+          console.log(me_info);
           showOk("Authenticated via OAUTH: Your roles are '" + me_info.roles +
-            "' your user is '" + me_info.user + "' and your userrole is '" +
+            "' your username is '" + me_info.user.username + "' and your userrole is '" +
             me_info.userRole + "'\n" + "Url Hash Part: '" + url_part_hash + "'");
         }
         else {
