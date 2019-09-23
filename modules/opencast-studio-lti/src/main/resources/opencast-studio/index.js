@@ -1,4 +1,5 @@
 function showFailed(errorText) {
+    console.log(errorText);
     let body = document.getElementsByTagName('body')[0];
     body.style.backgroundColor = "#903030";
     body.innerHTML = "Failed! Error: " + errorText;
@@ -75,8 +76,20 @@ function cred_xhr(url, type, data, isUrlencoded) {
 
 function main() {
     let origin = window.location.origin;
-    cred_xhr(origin + "/info/me.json").then(me_info => {
-        showOk(me_info);
+    let url_part_hash = window.location.hash;
+    cred_xhr(origin + "/info/me.json").then(me_info_json => {
+        let me_info = JSON.parse(me_info_json);
+        if (me_info.roles.includes("ROLE_OAUTH_USER")) {
+          showOk("Authenticated via OAUTH: Your roles are '" + me_info.roles +
+            "' your user is '" + me_info.user + "' and your userrole is '" +
+            me_info.userRole + "'\n" + "Url Hash Part: '" + url_part_hash + "'");
+        }
+        else {
+          showFailed("OAUTH ROLE not set, not authenticated over OAUTH? me_info: " + me_info);
+        }
+    })
+    .then(() => {}, err => {
+      showFailed(err);
     })
 }
 
