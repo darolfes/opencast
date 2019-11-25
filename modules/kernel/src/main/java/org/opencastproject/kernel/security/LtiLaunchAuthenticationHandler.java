@@ -29,6 +29,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -55,6 +58,13 @@ import javax.servlet.http.HttpServletRequest;
  * Callback interface for handing authentication details that are used when an authenticated request for a protected
  * resource is received.
  */
+@Component(
+  property = {
+    "service.description=LTI authentication helper"
+  },
+  immediate = true,
+  service = { OAuthAuthenticationHandler.class, ManagedService.class }
+)
 public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandler, ManagedService {
 
   /** The logger */
@@ -114,10 +124,12 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
   /**
    * OSGi DI
    */
+  @Reference(name = "userDetailsService")
   public void setUserDetailsService(UserDetailsService userDetailsService) {
     this.userDetailsService = userDetailsService;
   }
 
+  @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activating LtiLaunchAuthenticationHandler");
     componentContext = cc;
