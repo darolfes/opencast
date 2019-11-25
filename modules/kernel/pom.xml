@@ -297,7 +297,6 @@
             </_exportcontents>
             <Service-Component>
               OSGI-INF/bundle-info.xml,
-              OSGI-INF/cleansessions.xml,
               OSGI-INF/http-context.xml,
               OSGI-INF/https-filter.xml,
               OSGI-INF/jsonp.xml,
