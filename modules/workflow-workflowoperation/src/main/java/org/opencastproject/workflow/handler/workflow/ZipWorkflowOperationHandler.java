@@ -32,6 +32,7 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.MediaPackageSerializer;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.ChecksumType;
 import org.opencastproject.util.FileSupport;
@@ -41,6 +42,7 @@ import org.opencastproject.util.ZipUtil;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
@@ -50,6 +52,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,6 +72,14 @@ import java.util.List;
  * Produces a zipped archive of a mediapackage, places it in the archive collection, and removes the rest of the
  * mediapackage elements from both the mediapackage xml and if possible, from storage altogether.
  */
+@Component(
+  property = {
+    "service.description=Zip Workflow Operation Handler",
+    "workflow.operation=zip"
+  },
+  immediate = true,
+  service = { WorkflowOperationHandler.class }
+)
 public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** The logger */
@@ -111,11 +124,24 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
   protected Workspace workspace;
 
   /**
+   * Sets the registry of the AbstractWorkflowOperationHandler
+   *
+   * @param serviceRegistry
+   *          the service registry
+   */
+  @Override
+  @Reference(name = "ServiceRegistry")
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
+  /**
    * Sets the workspace to use.
    *
    * @param workspace
    *          the workspace
    */
+  @Reference(name = "Workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -128,6 +154,7 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
    *
    * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#activate(org.osgi.service.component.ComponentContext)
    */
+  @Activate
   protected void activate(ComponentContext cc) {
     tempStorageDir = StringUtils.isNotBlank(cc.getBundleContext().getProperty(ZIP_ARCHIVE_TEMP_DIR_CFG_KEY))
       ? new File(cc.getBundleContext().getProperty(ZIP_ARCHIVE_TEMP_DIR_CFG_KEY))

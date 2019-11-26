@@ -26,15 +26,19 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +49,14 @@ import java.util.List;
 /**
  * Simple implementation that holds for user-entered trim points.
  */
+@Component(
+  property = {
+    "service.description=Tag Workflow Handler",
+    "workflow.operation=tag"
+  },
+  immediate = true,
+  service = { WorkflowOperationHandler.class }
+)
 public class TagWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(TagWorkflowOperationHandler.class);
@@ -65,6 +77,18 @@ public class TagWorkflowOperationHandler extends AbstractWorkflowOperationHandle
 
   /** Name of the configuration option that provides the copy boolean we are looking for */
   public static final String COPY_PROPERTY = "copy";
+
+  /**
+   * Sets the registry of the AbstractWorkflowOperationHandler
+   *
+   * @param serviceRegistry
+   *          the service registry
+   */
+  @Override
+  @Reference(name = "ServiceRegistry")
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
 
   /**
    * {@inheritDoc}
