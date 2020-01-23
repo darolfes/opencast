@@ -37,6 +37,18 @@
                   </arguments>
                 </configuration>
               </execution>
+
+              <execution>
+                <phase>validate</phase>
+                <id>npm build opencast-studio</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>npm</executable>
+                  <arguments>run build-oc-studio</arguments>
+                </configuration>
+              </execution>
             </executions>
           </plugin>
         </plugins>
@@ -77,6 +89,17 @@
                   <arguments>install</arguments>
                 </configuration>
               </execution>
+
+              <execution>
+                <phase>validate</phase>
+                <id>npm build opencast-studio</id>
+                <goals>
+                  <goal>npm</goal>
+                </goals>
+                <configuration>
+                  <arguments>run build-oc-studio</arguments>
+                </configuration>
+              </execution>
             </executions>
           </plugin>
         </plugins>
@@ -92,24 +115,16 @@
         <artifactId>maven-resources-plugin</artifactId>
         <executions>
           <execution>
-            <id>copy-libs</id>
+            <id>copy-oc-studio</id>
             <phase>compile</phase>
             <goals>
               <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>${basedir}/target/classes/opencast-studio/lib/</outputDirectory>
+              <outputDirectory>${basedir}/target/classes/opencast-studio/</outputDirectory>
               <resources>
                 <resource>
-                  <directory>node_modules/</directory>
-                  <includes>
-                    <include>font-awesome/css/font-awesome.min.css</include>
-                    <include>font-awesome/fonts/**</include>
-                    <include>jquery/dist/jquery.min.js</include>
-                    <include>mustache/mustache.min.js</include>
-                    <include>paginationjs/dist/pagination.css</include>
-                    <include>paginationjs/dist/pagination.min.js</include>
-                  </includes>
+                  <directory>node_modules/opencast-studio/build/</directory>
                   <filtering>false</filtering>
                 </resource>
               </resources>

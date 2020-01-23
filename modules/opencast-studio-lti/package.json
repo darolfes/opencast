@@ -1,16 +1,10 @@
 {
   "name": "opencast-studio-lti",
   "private": true,
-  "scripts": {},
-  "dependencies": {
-    "font-awesome": "^4.7.0",
-    "jquery": "^3.4.1",
-    "mustache": "^3.0.3",
-    "paginationjs": "^2.1.4"
+  "scripts": {
+    "build-oc-studio": "cd node_modules/opencast-studio && npm run build"
   },
-  "devDependencies": {
-    "eslint": "^6.3.0",
-    "eslint-plugin-header": "^3.0.0",
-    "html-linter": "^1.1.1"
+  "dependencies": {
+    "opencast-studio": "github:elan-ev/opencast-studio#5c70810b09320028f52055db137ee9220633b560"
   }
 }
