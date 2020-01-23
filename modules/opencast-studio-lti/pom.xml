@@ -46,7 +46,10 @@
                 </goals>
                 <configuration>
                   <executable>npm</executable>
-                  <arguments>run build-oc-studio</arguments>
+                  <arguments>
+                    <argument>run</argument>
+                    <argument>build-oc-studio</argument>
+                  </arguments>
                 </configuration>
               </execution>
             </executions>
