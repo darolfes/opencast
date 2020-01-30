@@ -1,5 +1,5 @@
 {
-  "name": "opencast-studio-lti",
+  "name": "studio-module",
   "private": true,
   "scripts": {
     "build-oc-studio": "export PUBLIC_URL=/studio && cd node_modules/opencast-studio && npm run build"
