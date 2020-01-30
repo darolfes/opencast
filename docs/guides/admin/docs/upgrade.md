@@ -15,6 +15,12 @@ versions of Opencast, please refer to [older release notes](https://docs.opencas
 9. [Rebuild the Elasticsearch indexes](#rebuild-the-elasticsearch-indexes)
 10. [Check passwords](#check-passwords)
 
+Configuration Changes
+---------------------
+
+1. The configuration file `etc/org.opencastproject.kernel.security.LtiLaunchAuthenticationHandler.cfg` was moved
+   to `etc/org.opencastproject.security.lti.LtiLaunchAuthenticationHandler.cfg`.
+
 Install and configure a standalone Elasticsearch node
 -----------------------------------------------------
 
