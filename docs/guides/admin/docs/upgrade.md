@@ -17,6 +17,8 @@ Configuration Changes
    to `org.opencastproject.elasticsearch.server.hostname` and now defaults to `localhost` (was: `127.0.0.1`).
    - The property `org.opencastproject.elasticsearch.server.port` now defaults to `9200` (was: `9300`).
    - A new property `org.opencastproject.elasticsearch.server.scheme` was added and defaults to `http`.
+4. The configuration file `etc/org.opencastproject.kernel.security.LtiLaunchAuthenticationHandler.cfg` was moved
+   to `etc/org.opencastproject.security.lti.LtiLaunchAuthenticationHandler.cfg`.
 
 How to Upgrade
 --------------
