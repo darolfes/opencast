@@ -2,7 +2,7 @@
   "name": "studio-module",
   "private": true,
   "scripts": {
-    "build-oc-studio": "export PUBLIC_URL=/studio && cd node_modules/opencast-studio && npm run build && cp -v ../../settings.json build/."
+    "build-oc-studio": "export PUBLIC_URL=/studio/ && cd node_modules/opencast-studio && npm run build && cp -v ../../settings.json build/."
   },
   "dependencies": {
     "opencast-studio": "github:elan-ev/opencast-studio#b9f78c2bb56b00de2f8eb0e1fa2f88878bbaf4e0"
