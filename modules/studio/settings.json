@@ -1,7 +1,6 @@
 {
   "opencast": {
     "serverUrl": "/",
-    "loginName": "top",
-    "loginPassword": "secret"
+    "loginProvided": true
   }
 }
