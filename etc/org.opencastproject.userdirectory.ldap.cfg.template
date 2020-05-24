@@ -33,7 +33,7 @@ org.opencastproject.userdirectory.ldap.searchfilter=
 
 ## The comma-separated list of attributes that will be translated into roles.
 ## Note that the attributes may be converted to uppercase and prefixed depending on the configuration below.
-## Please refer to the documentation of the "roleprefix" property.
+## Please refer to the documentation of the "roleprefix" and "groupprefix" property.
 ## Example: berkeleyEduAffiliations,departmentNumber
 org.opencastproject.userdirectory.ldap.roleattributes=
 
@@ -71,6 +71,10 @@ org.opencastproject.userdirectory.ldap.roleattributes=
 ## Please note that if the "uppercase" parameter was provided, these prefixes are converted accordingly
 ## Default: <empty>
 #org.opencastproject.userdirectory.ldap.exclude.prefixes=
+
+## A prefix which is used to determine whether a roleattribute value should be added as a group to a user
+## Default: ROLE_GROUP_
+#org.opencastproject.userdirectory.ldap.groupprefix=ROLE_GROUP_
 
 ## Whether or not the role names should be converted to uppercase. It defaults to "true".
 ## Please note that this setting affects the prefix defined above.

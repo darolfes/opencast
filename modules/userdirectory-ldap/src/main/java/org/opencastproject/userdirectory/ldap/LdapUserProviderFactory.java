@@ -97,6 +97,12 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
    */
   private static final String EXCLUDE_PREFIXES_KEY = "org.opencastproject.userdirectory.ldap.exclude.prefixes";
 
+  /**
+   * The key to indicate a prefix,
+   * which is used to check whether a roleattribute value shall be added as a group to the user
+   */
+  private static final String GROUP_CHECK_PREFIX_KEY = "org.opencastproject.userdirectory.ldap.groupprefix";
+
   /** The key to indicate whether or not the roles should be converted to uppercase */
   private static final String UPPERCASE_KEY = "org.opencastproject.userdirectory.ldap.uppercase";
 
@@ -207,6 +213,7 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
     // optional with default values
     String rolePrefix = Objects.toString(properties.get(ROLE_PREFIX_KEY), "ROLE_");
     String[] excludePrefixes = StringUtils.split((String) properties.get(EXCLUDE_PREFIXES_KEY), ",");
+    String groupCheckPrefix = Objects.toString(properties.get(GROUP_CHECK_PREFIX_KEY), "ROLE_GROUP_");
     String[] extraRoles =  StringUtils.split(Objects.toString(properties.get(EXTRA_ROLES_KEY), ""), ",");
     boolean convertToUppercase = BooleanUtils.toBoolean(Objects.toString(properties.get(UPPERCASE_KEY), "true"));
     int cacheSize = NumberUtils.toInt((String) properties.get(CACHE_SIZE), 1000);
@@ -245,7 +252,8 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
     providerRegistrations.put(pid, bundleContext.registerService(UserProvider.class.getName(), provider, null));
 
     OpencastLdapAuthoritiesPopulator authoritiesPopulator = new OpencastLdapAuthoritiesPopulator(roleAttributes,
-            rolePrefix, excludePrefixes, convertToUppercase, org, securityService, groupRoleProvider, extraRoles);
+            rolePrefix, excludePrefixes, groupCheckPrefix, convertToUppercase, org, securityService,
+            groupRoleProvider, extraRoles);
 
     // Also, register this instance as LdapAuthoritiesPopulator so that it can be used within the security.xml file
     authoritiesPopulatorRegistrations.put(pid,

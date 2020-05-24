@@ -36,6 +36,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -52,6 +53,7 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
   private String[] additionalAuthorities;
   private String prefix = "";
   private Set<String> excludedPrefixes = new HashSet<>();
+  private String groupCheckPrefix = null;
   private boolean uppercase = true;
   private Organization organization;
   private SecurityService securityService;
@@ -62,7 +64,7 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
    * Activate component
    */
   public OpencastLdapAuthoritiesPopulator(String attributeNames, String prefix, String[] aExcludedPrefixes,
-          boolean uppercase, Organization organization, SecurityService securityService,
+          String groupCheckPrefix, boolean uppercase, Organization organization, SecurityService securityService,
           JpaGroupRoleProvider groupRoleProvider, String... additionalAuthorities) {
 
     debug("Creating new instance");
@@ -127,6 +129,11 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
         }
       }
 
+    if (groupCheckPrefix == null) {
+      throw new IllegalArgumentException("The parameter groupCheckPrefix cannot be null");
+    }
+    this.groupCheckPrefix = groupCheckPrefix;
+
     if (additionalAuthorities == null)
       this.additionalAuthorities = new String[0];
     else
@@ -151,7 +158,11 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
         if (attributeValues != null) {
           for (String attributeValue : attributeValues) {
             // The attribute value may be a single authority (a single role) or a list of roles
-            addAuthorities(authorities, attributeValue.split(","));
+            // ignore attributes which aren't groups according to groupCheckPrefix
+            String[] groups = Arrays.stream(attributeValue.split(","))
+                    .filter(x -> x.startsWith(groupCheckPrefix))
+                    .toArray(String[]::new);
+            addAuthorities(authorities, groups);
           }
         } else {
           debug("({}) Could not find any attribute named '{}' in user '{}'", attributeName, userData.getDn());
