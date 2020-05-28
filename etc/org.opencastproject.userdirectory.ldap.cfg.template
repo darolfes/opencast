@@ -76,6 +76,12 @@ org.opencastproject.userdirectory.ldap.roleattributes=
 ## Default: ROLE_GROUP_
 #org.opencastproject.userdirectory.ldap.groupprefix=ROLE_GROUP_
 
+## It is possible to define a mapping of LDAP roleattribute values (defined above) to specific opencast roles or groups.
+## For example the following two lines add the the opencast group 'ROLE_GROUP_EXAMPLE' and role 'ROLE_EXAMPLE'
+## to any user which has the LDAP roleattribute value 'example':
+#org.opencastproject.userdirectory.ldap.roles.example=ROLE_EXAMPLE
+#org.opencastproject.userdirectory.ldap.groups.example=ROLE_GROUP_EXAMPLE
+
 ## Whether or not the role names should be converted to uppercase. It defaults to "true".
 ## Please note that this setting affects the prefix defined above.
 ## Default: true

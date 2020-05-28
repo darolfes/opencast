@@ -51,6 +51,7 @@ import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -103,7 +104,7 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
   private Set<String> setExcludePrefixes = new HashSet<>();
 
   /**
-   * Constructs an ldap user provider with the needed settings.
+   * Constructs an ldap user provider with the needed settings. TODO
    *
    * @param pid
    *          the pid of this service
@@ -139,8 +140,8 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
   // CHECKSTYLE:OFF
   LdapUserProviderInstance(String pid, Organization organization, String searchBase, String searchFilter, String url,
           String userDn, String password, String roleAttributesGlob, String rolePrefix, String[] extraRoles,
-          String[] excludePrefixes, boolean convertToUppercase, int cacheSize, int cacheExpiration,
-          SecurityService securityService) {
+          String[] excludePrefixes, HashMap<String, String[]> ldapAssignmentRoleMap, boolean convertToUppercase, int cacheSize,
+          int cacheExpiration, SecurityService securityService) {
     // CHECKSTYLE:ON
     this.organization = organization;
     this.securityService = securityService;

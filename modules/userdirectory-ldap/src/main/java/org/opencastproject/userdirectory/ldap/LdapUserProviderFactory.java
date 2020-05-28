@@ -42,7 +42,9 @@ import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 
 import java.lang.management.ManagementFactory;
 import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -102,6 +104,12 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
    * which is used to check whether a roleattribute value shall be added as a group to the user
    */
   private static final String GROUP_CHECK_PREFIX_KEY = "org.opencastproject.userdirectory.ldap.groupprefix";
+
+  /** The prefix of the keys, which map a ldap roleattribute to opencast roles */
+  private static final String ROLE_ASSIGNMENT_KEY_PREFIX = "org.opencastproject.userdirectory.ldap.roles.";
+
+  /** The prefix of the keys, which map a ldap roleattribute to opencast groups */
+  private static final String GROUP_ASSIGNMENT_KEY_PREFIX = "org.opencastproject.userdirectory.ldap.groups.";
 
   /** The key to indicate whether or not the roles should be converted to uppercase */
   private static final String UPPERCASE_KEY = "org.opencastproject.userdirectory.ldap.uppercase";
@@ -219,6 +227,24 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
     int cacheSize = NumberUtils.toInt((String) properties.get(CACHE_SIZE), 1000);
     int cacheExpiration = NumberUtils.toInt((String) properties.get(CACHE_EXPIRATION), 5);
 
+    // maps
+    HashMap<String, String[]> ldapAssignmentRoleMap = new HashMap();
+    HashMap<String, String[]> ldapAssignmentGroupMap = new HashMap();
+    for (Enumeration<String> e = properties.keys(); e.hasMoreElements();) {
+        String key = e.nextElement();
+
+        if (key.startsWith(ROLE_ASSIGNMENT_KEY_PREFIX)) {
+            String value = (String) properties.get(key);
+            String cutKey = key.substring(ROLE_ASSIGNMENT_KEY_PREFIX.length());
+            ldapAssignmentRoleMap.put(cutKey, value.split(","));
+        }
+        if (key.startsWith(GROUP_ASSIGNMENT_KEY_PREFIX)) {
+            String value = (String) properties.get(key);
+            String cutKey = key.substring(GROUP_ASSIGNMENT_KEY_PREFIX.length());
+            ldapAssignmentGroupMap.put(cutKey, value.split(","));
+        }
+    }
+
     // Now that we have everything we need, go ahead and activate a new provider, removing an old one if necessary
     ServiceRegistration existingRegistration = providerRegistrations.remove(pid);
     if (existingRegistration != null) {
@@ -246,14 +272,14 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
 
     // Instantiate this LDAP instance and register it as such
     LdapUserProviderInstance provider = new LdapUserProviderInstance(pid, org, searchBase, searchFilter, url, userDn,
-            password, roleAttributes, rolePrefix, extraRoles, excludePrefixes, convertToUppercase, cacheSize,
-            cacheExpiration, securityService);
+            password, roleAttributes, rolePrefix, extraRoles, excludePrefixes, ldapAssignmentRoleMap,
+            convertToUppercase, cacheSize, cacheExpiration, securityService);
 
     providerRegistrations.put(pid, bundleContext.registerService(UserProvider.class.getName(), provider, null));
 
     OpencastLdapAuthoritiesPopulator authoritiesPopulator = new OpencastLdapAuthoritiesPopulator(roleAttributes,
-            rolePrefix, excludePrefixes, groupCheckPrefix, convertToUppercase, org, securityService,
-            groupRoleProvider, extraRoles);
+            rolePrefix, excludePrefixes, groupCheckPrefix, ldapAssignmentGroupMap, convertToUppercase, org,
+            securityService, groupRoleProvider, extraRoles);
 
     // Also, register this instance as LdapAuthoritiesPopulator so that it can be used within the security.xml file
     authoritiesPopulatorRegistrations.put(pid,

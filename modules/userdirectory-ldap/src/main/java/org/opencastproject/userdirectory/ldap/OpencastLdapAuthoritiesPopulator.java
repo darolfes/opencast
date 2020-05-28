@@ -39,6 +39,7 @@ import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -54,6 +55,7 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
   private String prefix = "";
   private Set<String> excludedPrefixes = new HashSet<>();
   private String groupCheckPrefix = null;
+  private HashMap<String, String[]> ldapAssignmentGroupMap = null;
   private boolean uppercase = true;
   private Organization organization;
   private SecurityService securityService;
@@ -64,8 +66,9 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
    * Activate component
    */
   public OpencastLdapAuthoritiesPopulator(String attributeNames, String prefix, String[] aExcludedPrefixes,
-          String groupCheckPrefix, boolean uppercase, Organization organization, SecurityService securityService,
-          JpaGroupRoleProvider groupRoleProvider, String... additionalAuthorities) {
+          String groupCheckPrefix, HashMap<String, String[]> ldapAssignmentGroupMap, boolean uppercase,
+          Organization organization, SecurityService securityService, JpaGroupRoleProvider groupRoleProvider,
+          String... additionalAuthorities) {
 
     debug("Creating new instance");
 
@@ -134,6 +137,11 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
     }
     this.groupCheckPrefix = groupCheckPrefix;
 
+    if (ldapAssignmentGroupMap == null) {
+      throw new IllegalArgumentException("The parameter ldapAssignmentGroupMap cannot be null");
+    }
+    this.ldapAssignmentGroupMap = ldapAssignmentGroupMap;
+
     if (additionalAuthorities == null)
       this.additionalAuthorities = new String[0];
     else
@@ -158,11 +166,20 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
         if (attributeValues != null) {
           for (String attributeValue : attributeValues) {
             // The attribute value may be a single authority (a single role) or a list of roles
+            String[] splitValue =  attributeValue.split(",");
             // ignore attributes which aren't groups according to groupCheckPrefix
-            String[] groups = Arrays.stream(attributeValue.split(","))
+            String[] groups = Arrays.stream(splitValue)
                     .filter(x -> x.startsWith(groupCheckPrefix))
                     .toArray(String[]::new);
             addAuthorities(authorities, groups);
+
+            // map attribute values to groups
+            String[] mappedGroups = Arrays.stream(splitValue)
+                    .map(x -> ldapAssignmentGroupMap.get(x))
+                    .filter(x -> x != null)
+                    .flatMap(x -> Arrays.stream(x))
+                    .toArray(String[]::new);
+            addAuthorities(authorities, mappedGroups);
           }
         } else {
           debug("({}) Could not find any attribute named '{}' in user '{}'", attributeName, userData.getDn());
