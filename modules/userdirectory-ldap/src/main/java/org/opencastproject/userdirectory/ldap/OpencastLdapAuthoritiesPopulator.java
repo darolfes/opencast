@@ -55,7 +55,7 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
   private String prefix = "";
   private Set<String> excludedPrefixes = new HashSet<>();
   private String groupCheckPrefix = null;
-  private HashMap<String, String[]> ldapAssignmentGroupMap = null;
+  private HashMap<String, String[]> ldapAssignmentGroupMap = new HashMap();
   private boolean uppercase = true;
   private Organization organization;
   private SecurityService securityService;
@@ -137,10 +137,9 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
     }
     this.groupCheckPrefix = groupCheckPrefix;
 
-    if (ldapAssignmentGroupMap == null) {
-      throw new IllegalArgumentException("The parameter ldapAssignmentGroupMap cannot be null");
+    if (ldapAssignmentGroupMap != null) {
+      this.ldapAssignmentGroupMap = ldapAssignmentGroupMap;
     }
-    this.ldapAssignmentGroupMap = ldapAssignmentGroupMap;
 
     if (additionalAuthorities == null)
       this.additionalAuthorities = new String[0];

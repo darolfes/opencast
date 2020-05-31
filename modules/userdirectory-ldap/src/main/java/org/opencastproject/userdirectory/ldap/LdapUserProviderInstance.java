@@ -49,6 +49,7 @@ import org.springframework.security.ldap.userdetails.LdapUserDetailsService;
 
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -56,6 +57,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -102,6 +105,9 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
 
   /** A Set of prefixes. When a role starts with any of these, the role prefix defined above will not be prepended */
   private Set<String> setExcludePrefixes = new HashSet<>();
+
+  /** Mapping of ldap assignments to opencast roles */
+  private HashMap<String, String[]> ldapAssignmentRoleMap = new HashMap();
 
   /**
    * Constructs an ldap user provider with the needed settings. TODO
@@ -213,6 +219,10 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
           }
         }
       }
+    }
+
+    if (ldapAssignmentRoleMap != null) {
+      this.ldapAssignmentRoleMap = ldapAssignmentRoleMap;
     }
 
     // Process extra roles
@@ -330,13 +340,24 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
 
       JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
 
+      Collection<GrantedAuthority> springAuthorities = (Collection<GrantedAuthority>) userDetails.getAuthorities();
+
+      // Add mapped roles
+      Set<JaxbRole> roles = springAuthorities.stream()
+              .map(auth -> auth.getAuthority())
+              .map(strAuth -> ldapAssignmentRoleMap.get(strAuth))
+              .filter(arrRole -> arrRole != null)
+              .flatMap(arrRole -> Arrays.stream(arrRole))
+              .map(role -> new JaxbRole(role, jaxbOrganization))
+              .collect(Collectors.toCollection(HashSet::new));
+
       // Get the roles and add the extra roles
       Collection<GrantedAuthority> authorities = new HashSet<>();
-      authorities.addAll(userDetails.getAuthorities());
+      authorities.addAll(springAuthorities);
       authorities.addAll(setExtraRoles);
 
-      Set<JaxbRole> roles = new HashSet<>();
       /*
+       * Add roles
        * Please note the prefix logic for roles:
        *
        * - Roles that start with any of the "exclude prefixes" are left intact
