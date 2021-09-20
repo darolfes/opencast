@@ -62,7 +62,7 @@
     "html-linter": "html-linter --config ../../docs/checkstyle/html-linter.json 'app/**/*.html'"
   },
   "dependencies": {
-    "coffeescript": "^2.5.1",
+    "coffeescript": "^2.6.0",
     "node-sass": "^5.0.0"
   }
 }
